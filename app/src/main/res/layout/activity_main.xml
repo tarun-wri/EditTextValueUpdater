@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center"
+    tools:context="com.blogspot.pc_hub.edittextvalueupdatersample.MainActivity">
+
+    <ImageView
+        android:id="@+id/ivDecrease"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground"
+        app:srcCompat="@drawable/ic_arrow_upward_black_24dp"/>
+
+    <EditText
+        android:id="@+id/etValue"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:textSize="20sp"
+        android:inputType="number"/>
+
+    <ImageView
+        android:id="@+id/ivIncrease"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground"
+        app:srcCompat="@drawable/ic_arrow_downward_black_24dp"/>
+
+</LinearLayout>
