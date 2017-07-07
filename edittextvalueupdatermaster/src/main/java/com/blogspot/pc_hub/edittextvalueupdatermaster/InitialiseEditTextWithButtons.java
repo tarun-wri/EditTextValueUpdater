@@ -38,7 +38,7 @@ public class InitialiseEditTextWithButtons implements View.OnClickListener {
     }
 
     public void setMaxLength(int maxLength){
-        
+
     }
 
     public void setInitialValue(int initialValue){
@@ -49,8 +49,6 @@ public class InitialiseEditTextWithButtons implements View.OnClickListener {
     }
 
     public void startShow(){
-
-
 
         ivIncrease.setOnClickListener(this);
         ivDecrease.setOnClickListener(this);
