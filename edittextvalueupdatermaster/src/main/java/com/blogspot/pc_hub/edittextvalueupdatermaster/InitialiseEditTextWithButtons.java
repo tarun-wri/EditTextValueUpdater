@@ -1,151 +1,104 @@
-package com.blogspot.pc_hub.edittextvalueupdatermaster;
+package com.webreinvent.speedotracker.helper;
 
+import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 
 /**
- * Created by pchub on 06-07-2017.
+ * Value Updater class to get value updates on different scenarios
+ *
+ * <p>
+ *     Set min and max values to this class and then when you
+ *     call {@link #getUpdatedValue(boolean)} method it will return
+ *     you the updated value in between the min or max values
+ * </p>
+ *
+ * <p>
+ *     If no value is set in min value then the default value will be zero. This class returns integer values
+ *     but you are free to edit this as per your needs.
+ * </p>
+ *
+ * <p>
+ *     <b>Note*</b> <br/>
+ *     Call {@link #getLongPressUpdates(boolean, View)} to get regular updates on long pressed view.
+ * </p>
  */
 
-public class InitialiseEditTextWithButtons implements View.OnClickListener, View.OnLongClickListener {
+public class ValueUpdater {
 
     /**
-     * Public Interface ValueUpdater
-     * Call this interface to get regular value updates from your View clicks
+     * Interface to get updated values when a view is long pressed
      */
-    public interface ValueUpdater {
-        void onValueChanged(int value);
+    public interface LongPressUpdates{
+        /**
+         * This interface method
+         * @param updatedValue Updated value
+         */
+        void onUpdatedValue(int updatedValue);
     }
 
-    private EditText etMainValue;
-    private View vIncrease, vDecrease;
+    public int min, max;
 
-    // Min length of the EditText
-    private int minValue = 0;
+    private int period = 350;
+    private int counter = 0;
+    private int thresholdValue = 0;
 
-    // Max length of the EditText
-    private int maxValue = 999;
+    private Handler handler = new Handler();
 
-    // Updated Value
-    private int updatedValue = minValue;
+    View longPressedView;
 
-    // Value Updater interface object
-    ValueUpdater valueUpdater;
+    public ValueUpdater(){
 
-    // Speed of the value updates
-    private int updateSpeed = 700;
-
-    private static final String TAG = "EditTextValueUpdater";
-
-    public InitialiseEditTextWithButtons(@NonNull ValueUpdater valueUpdater, View vIncrease, View vDecrease) {
-        this.valueUpdater = valueUpdater;
-        this.vIncrease = vIncrease;
-        this.vDecrease = vDecrease;
     }
-
-    public InitialiseEditTextWithButtons(@NonNull EditText etMainValue, View vIncrease, View vDecrease) {
-        this.etMainValue = etMainValue;
-        this.vIncrease = vIncrease;
-        this.vDecrease = vDecrease;
-    }
-
-    public void setMinValue(int minValue) {
-        this.minValue = minValue;
-    }
-
-    public void setMaxValue(int maxValue) {
-        this.maxValue = maxValue;
-    }
-
-    public void setInitialValue(int initialValue) {
-        if (initialValue < minValue)
-            updateValue(minValue);
-        else
-            updateValue(initialValue);
-    }
-
 
     /**
-     * Sets the initial speed of the value updater for long clicks.
+     * This method will start a handler which will update value exponentially with every update
+     * @param isIncreased boolean to indicate whether the value is increased or decreased
+     * @param longPressedView {@link android.support.annotation.NonNull} View which is long pressed
+     */
+    public void getLongPressUpdates(boolean isIncreased,@NonNull View longPressedView){
+        this.longPressedView = longPressedView;
+    }
+
+    /**
      *
-     * @param initialSpeedInMills Should be greater than 200
+     * @param isIncreased Send true if plus button is pressed and send false if minus button is pressed
+     *
+     * @return Returns the updated integer value
      */
-    public void setInitialSpeedInMills(int initialSpeedInMills) {
-
-        if (initialSpeedInMills < 200)
-            updateSpeed = 200;
-        else
-            updateSpeed = initialSpeedInMills;
+    public int getUpdatedValue(boolean isIncreased){
+        return 0;
     }
-
-    public void startShow() {
-
-        Log.d(TAG, "startShow: Setting click listeners");
-        vIncrease.setOnClickListener(this);
-        vDecrease.setOnClickListener(this);
-
-        vIncrease.setOnLongClickListener(this);
-        vDecrease.setOnLongClickListener(this);
-
-        etMainValue.addTextChangedListener(mTextWatcher);
-    }
-
-    @Override
-    public void onClick(View view) {
-
-        if (view.equals(vDecrease)) {
-
-            Log.d(TAG, "onClick: IV DECREASE");
-
-        } else if (view.equals(vIncrease)) {
-            Log.d(TAG, "onClick: IV INCREASE");
-        }
-
-    }
-
-    @Override
-    public boolean onLongClick(View view) {
-        Log.d(TAG, "onLongClick: VIEW CLICKED");
-
-        return true;
-    }
-
-
-    private TextWatcher mTextWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            // We don't need to use this in our case
-        }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            // Hmm..this seems interesting..let's play with this
-            // We will get every single change that will happen in the EditText in this method
-
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-
-        }
-    };
 
     /**
-     * This will update the data to the provided medium
-     * @param value Updated Value obtained from the clicks on Views
-     * */
-    private void updateValue(int value){
-        if(valueUpdater != null){
-            valueUpdater.onValueChanged(value);
+     * Timer to update values on long button clicks
+     *
+     * @param increaseThreshold Boolean increaseThreshold. Set to true if you want to increase threshold otherwise set to false to decrease it.
+     */
+    private void startTimer(final boolean increaseThreshold) {
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+
+                Log.d("log", "TIMER IS RUNNING");
+                if (longPressedView.isPressed()) {
+
+                    if (thresholdValue != 999) {
+                        if (period > 10) {
+                            counter++;
+                            period -= counter;
+                        }
+                        startTimer(increaseThreshold);
+                    }
+                }
+            }
+        };
+
+        if (longPressedView.isPressed()) {
+            handler.postDelayed(r, period);
         }
 
-        if(etMainValue != null){
-            etMainValue.setText(String.valueOf(value));
-        }
     }
 }
